@@ -1,3 +1,6 @@
+webpack:
+	npm run webpack
+
 develop:
 	npx webpack serve
 
