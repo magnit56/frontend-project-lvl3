@@ -54,13 +54,20 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.10.2",
+    "axios": "^0.24.0",
     "bootstrap": "^5.1.2",
+    "core-js": "^3.20.1",
+    "i18next": "^21.6.3",
     "jquery": "^3.6.0",
     "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21",
     "npm-check-updates": "^11.8.5",
+    "on-change": "^4.0.0",
     "path": "^0.12.7",
     "popper.js": "^1.16.1",
+    "regenerator-runtime": "^0.13.9",
     "sass": "^1.39.0",
-    "sass-loader": "^12.1.0"
+    "sass-loader": "^12.1.0",
+    "yup": "^0.32.11"
   }
 }

@@ -3,6 +3,8 @@ import './styles.css';
 import jQuery from 'jquery';
 import 'popper.js';
 import 'bootstrap';
-import app from './app.js';
+import 'core-js/stable/index.js';
+import 'regenerator-runtime/runtime.js';
+import runApp from './init.js';
 
-app();
+runApp();
