@@ -30,7 +30,7 @@ export default (i18nInstance) => {
         renderInputStatus(watchedState.ui.condition);
       }
       if (path === 'ui.lastMessage') {
-        renderFlashStatus(watchedState.ui);
+        renderFlashMessage(watchedState.ui);
       }
       if (path === 'feeds') {
         renderFeeds(watchedState.feeds);
@@ -59,31 +59,27 @@ export default (i18nInstance) => {
       })
       .then(() => {
         changeCondition('default');
-      }).catch((err) => {
-        changeCondition('validationError', err.message);
+      })
+      .catch((err) => {
+        changeCondition('userError', err.message);
       })
       .then(() => {
         if (watchedState.ui.condition === 'default') {
           const encodedUrl = encodeURIComponent(url);
-          const response = axios.get(`https://hexlet-allorigins.herokuapp.com/get?url=${encodedUrl}`);
+          const response = axios.get(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodedUrl}`);
           return response;
         }
         return null;
       })
       .catch(() => {
-        changeCondition('otherError', 'network error');
+        changeCondition('otherError', i18nInstance.t('networkError'));
       })
       .then((response) => {
         if (watchedState.ui.condition === 'default') {
-          // const parser = new DOMParser();
-          // console.log(parser.parseFromString(response.data, 'text/xml'));
-          // console.log(response.data);
-          // console.log(parse(response.data.contents));
-          // console.log(watchedState);
           const newFeed = parse(response.data.contents);
           const feedId = uniqueId();
           if (isFeedExists(watchedState.feeds, newFeed)) {
-            changeCondition('otherError', 'Уже существует');
+            changeCondition('otherError', i18nInstance.t('already_exists'));
             return;
           }
           watchedState.feeds = [...watchedState.feeds, {
@@ -100,15 +96,39 @@ export default (i18nInstance) => {
             description: post.description,
             link: post.link,
           }))];
-          console.log(watchedState);
-          changeCondition('success', 'success');
+          changeCondition('success', i18nInstance.t('success'));
         }
       })
       .catch(() => {
-        changeCondition('validationError', 'parse error');
+        changeCondition('userError', i18nInstance.t('parseError'));
       })
       .then(() => {
-        console.log('конец');
+        const encodedUrl = encodeURIComponent(url);
+        const handler = () => axios.get(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodedUrl}`)
+          .then((response) => {
+            const updatedFeed = parse(response.data.contents);
+            const feedId = _.find(watchedState.feeds, { link: updatedFeed.link }).id;
+
+            const newPosts = updatedFeed.posts
+              .filter((post) => !(_.find(watchedState.posts, { link: post.link })));
+
+            watchedState.posts = [...watchedState.posts, ...newPosts.map((post) => ({
+              feedId,
+              id: uniqueId(),
+              guid: post.guid,
+              title: post.title,
+              description: post.description,
+              link: post.link,
+            }))];
+          })
+          .catch(() => {
+            // Do nothing!
+            console.log('error');
+          })
+          .then(() => {
+            setTimeout(handler, 5000);
+          });
+        setTimeout(handler, 5000);
       });
     return promise;
   });
@@ -120,22 +140,15 @@ const parse = (xml) => {
   if (!doc.querySelector('rss')) {
     throw new Error('ParseError');
   }
-  const feedTitle = doc.querySelector('rss channel title').innerHTML;
-  const feedDesctiption = doc.querySelector('rss channel description').innerHTML;
-  const feedLink = doc.querySelector('rss channel link').innerHTML;
+  const feedTitle = removeCdataFromString(doc.querySelector('rss channel title').innerHTML);
+  const feedDesctiption = removeCdataFromString(doc.querySelector('rss channel description').innerHTML);
+  const feedLink = removeCdataFromString(doc.querySelector('rss channel link').innerHTML);
 
   const posts = [...doc.querySelectorAll('rss channel item')].map((post) => {
-    const title = post.querySelector('title').innerHTML;
-    const description = post.querySelector('description').innerHTML;
-    
-    //console.log(post.querySelector('description'));
-    //console.log(post.querySelector('description'));
-    //console.log(post.querySelector('description').value);
-    //console.log(post.querySelector('description').innerHTML);
-    //console.log(post.querySelector('description').innerHTML.value);
-
-    const guid = post.querySelector('guid').innerHTML;
-    const link = post.querySelector('link').innerHTML;
+    const title = removeCdataFromString(post.querySelector('title').innerHTML);
+    const description = removeCdataFromString(post.querySelector('description').innerHTML);
+    const guid = removeCdataFromString(post.querySelector('guid').innerHTML);
+    const link = removeCdataFromString(post.querySelector('link').innerHTML);
     return {
       title, description, guid, link,
     };
@@ -147,6 +160,8 @@ const parse = (xml) => {
     posts,
   };
 };
+
+const removeCdataFromString = (str) => str.replace('<![CDATA[', '').replace(']]>', '');
 
 const renderFeeds = (feeds) => {
   const feedDiv = document.querySelector('.feeds');
@@ -256,18 +271,18 @@ const renderPosts = (posts, feeds) => {
 
 const renderInputStatus = (condition) => {
   const input = document.querySelector('#url-input');
-  if (condition === 'validationError') {
+  if (condition === 'userError') {
     input.classList.add('is-invalid');
   } else {
     input.classList.remove('is-invalid');
   }
 };
 
-const renderFlashStatus = (ui) => {
+const renderFlashMessage = (ui) => {
   const styles = {
     default: 'text-success',
     success: 'text-success',
-    validationError: 'text-danger',
+    userError: 'text-danger',
     otherError: 'text-danger',
   };
   const feedback = document.querySelector('p.feedback');
@@ -282,4 +297,5 @@ const isFeedExists = (feeds, newFeed) => (feeds.reduce((acc, feed) => ((feed.lin
 const clearInput = () => {
   const input = document.querySelector('#url-input');
   input.value = '';
-}
+  input.focus();
+};
