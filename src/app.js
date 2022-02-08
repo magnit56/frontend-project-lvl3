@@ -19,7 +19,7 @@ export default (i18nInstance) => {
   const viewPost = (e) => {
     // e.preventDefault();
     const { id } = e.target.dataset;
-    watchedState.ui.viewedPosts = [...watchedState.ui.viewedPosts, id];
+    watchedState.ui.viewedPosts = _.uniq([...watchedState.ui.viewedPosts, id]);
     console.log(watchedState);
   };
 
