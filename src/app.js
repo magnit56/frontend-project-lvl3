@@ -12,7 +12,15 @@ export default (i18nInstance) => {
     ui: {
       condition: 'default',
       lastMessage: '',
+      viewedPosts: [],
     },
+  };
+
+  const viewPost = (e) => {
+    // e.preventDefault();
+    const { id } = e.target.dataset;
+    watchedState.ui.viewedPosts = [...watchedState.ui.viewedPosts, id];
+    console.log(watchedState);
   };
 
   const changeCondition = (condition, message = '') => {
@@ -29,6 +37,9 @@ export default (i18nInstance) => {
         }
         renderInputStatus(watchedState.ui.condition);
       }
+      if (path === 'ui.viewedPosts') {
+        renderPosts(watchedState.posts, watchedState.feeds, watchedState.ui.viewedPosts, viewPost);
+      }
       if (path === 'ui.lastMessage') {
         renderFlashMessage(watchedState.ui);
       }
@@ -36,7 +47,7 @@ export default (i18nInstance) => {
         renderFeeds(watchedState.feeds);
       }
       if (path === 'posts') {
-        renderPosts(watchedState.posts, watchedState.feeds);
+        renderPosts(watchedState.posts, watchedState.feeds, watchedState.ui.viewedPosts, viewPost);
       }
     },
   );
@@ -205,7 +216,7 @@ const renderFeeds = (feeds) => {
   cardBodyDiv.append(cardTitleH2);
 };
 
-const renderPosts = (posts, feeds) => {
+const renderPosts = (posts, feeds, viewedPosts, viewPost) => {
   const postDiv = document.querySelector('.posts');
   postDiv.innerHTML = '';
   if (feeds.length === 0) {
@@ -226,13 +237,23 @@ const renderPosts = (posts, feeds) => {
   ul.classList.add('list-group', 'border-0', 'rounded-0');
 
   posts.forEach((post) => {
+    const isPostViewed = (id) => _.includes(viewedPosts, id);
+
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
     ul.append(li);
 
     const a = document.createElement('a');
+    a.setAttribute('data-id', post.id);
+    a.setAttribute('target', '_blank');
+    a.setAttribute('rel', 'noopener norefferer');
     a.href = post.link;
-    a.classList.add('fw-bold');
+
+    if (isPostViewed(post.id)) {
+      a.classList.add('fw-normal', 'link-secondary');
+    } else {
+      a.classList.add('fw-bold');
+    }
     a.innerHTML = post.title;
     li.append(a);
 
@@ -259,6 +280,9 @@ const renderPosts = (posts, feeds) => {
         modalDiv.style.display = 'none';
       });
     });
+
+    a.addEventListener('click', viewPost);
+    button.addEventListener('click', viewPost);
 
     li.append(button);
   });
@@ -292,7 +316,7 @@ const renderFlashMessage = (ui) => {
 };
 
 // eslint-disable-next-line max-len
-const isFeedExists = (feeds, newFeed) => (feeds.reduce((acc, feed) => ((feed.link === newFeed.link) ? true : acc), false));
+const isFeedExists = (feeds, newFeed) => (feeds.reduce((acc, feed) => ((feed.link === newFeed.link && feed.title === newFeed.title) ? true : acc), false));
 
 const clearInput = () => {
   const input = document.querySelector('#url-input');
