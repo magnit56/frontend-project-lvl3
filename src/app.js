@@ -86,6 +86,7 @@ export default (i18nInstance) => {
         changeCondition('otherError', i18nInstance.t('networkError'));
       })
       .then((response) => {
+        console.log(response.data.contents);
         if (watchedState.ui.condition === 'default') {
           const newFeed = parse(response.data.contents);
           const feedId = uniqueId();
