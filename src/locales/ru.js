@@ -7,13 +7,13 @@ export default {
     reset: 'Сбросить',
     */
     yup: {
-      invalid_url: 'Ссылка должна быть валидным URL успех!',
-      required: 'Должен быть успех!',
+      invalid_url: 'Ссылка должна быть валидным URL',
+      required: 'Не должно быть пустым',
       string: 'Должен быть строкой успех!',
     },
-    parseError: 'ошибка парсинга успех!',
-    networkError: 'ошибка сети успех!',
-    success: 'успех успех!',
-    already_exists: 'Уже существует успех!',
+    parseError: 'Ресурс не содержит валидный RSS',
+    networkError: 'Ошибка сети',
+    success: 'RSS успешно загружен',
+    already_exists: 'RSS уже существует',
   },
 };
