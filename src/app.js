@@ -39,6 +39,7 @@ export default (i18nInstance) => {
         renderInputStatus(watchedState.ui.condition);
       }
       if (path === 'ui.viewedPosts') {
+        // eslint-disable-next-line max-len
         renderPosts(watchedState.posts, watchedState.feeds, watchedState.ui.viewedPosts, viewPost, i18nInstance);
       }
       if (path === 'ui.lastMessage') {
@@ -48,6 +49,7 @@ export default (i18nInstance) => {
         renderFeeds(watchedState.feeds);
       }
       if (path === 'posts') {
+        // eslint-disable-next-line max-len
         renderPosts(watchedState.posts, watchedState.feeds, watchedState.ui.viewedPosts, viewPost, i18nInstance);
       }
     },
@@ -331,4 +333,4 @@ const clearInput = () => {
 const renderAddButton = (conditionName) => {
   const button = document.querySelector('#add');
   button.disabled = (conditionName === 'working');
-}
+};
