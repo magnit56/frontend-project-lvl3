@@ -10,7 +10,7 @@ export default (i18nInstance) => {
     feeds: [],
     posts: [],
     ui: {
-      condition: 'default',
+      condition: 'starting',
       lastMessage: '',
       viewedPosts: [],
     },
@@ -35,10 +35,11 @@ export default (i18nInstance) => {
         if (value === 'success') {
           clearInput();
         }
+        renderAddButton(watchedState.ui.condition);
         renderInputStatus(watchedState.ui.condition);
       }
       if (path === 'ui.viewedPosts') {
-        renderPosts(watchedState.posts, watchedState.feeds, watchedState.ui.viewedPosts, viewPost);
+        renderPosts(watchedState.posts, watchedState.feeds, watchedState.ui.viewedPosts, viewPost, i18nInstance);
       }
       if (path === 'ui.lastMessage') {
         renderFlashMessage(watchedState.ui);
@@ -47,7 +48,7 @@ export default (i18nInstance) => {
         renderFeeds(watchedState.feeds);
       }
       if (path === 'posts') {
-        renderPosts(watchedState.posts, watchedState.feeds, watchedState.ui.viewedPosts, viewPost);
+        renderPosts(watchedState.posts, watchedState.feeds, watchedState.ui.viewedPosts, viewPost, i18nInstance);
       }
     },
   );
@@ -69,13 +70,13 @@ export default (i18nInstance) => {
         url,
       })
       .then(() => {
-        changeCondition('default');
+        changeCondition('working');
       })
       .catch((err) => {
         changeCondition('userError', err.message);
       })
       .then(() => {
-        if (watchedState.ui.condition === 'default') {
+        if (watchedState.ui.condition === 'working') {
           const encodedUrl = encodeURIComponent(url);
           const response = axios.get(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodedUrl}`);
           return response;
@@ -84,10 +85,12 @@ export default (i18nInstance) => {
       })
       .catch(() => {
         changeCondition('otherError', i18nInstance.t('networkError'));
+        console.log('ошибка сети');
       })
       .then((response) => {
-        console.log(response.data.contents);
-        if (watchedState.ui.condition === 'default') {
+        // console.log('statustext', response.statusText)
+        // console.log('content', response.data.contents);
+        if (watchedState.ui.condition === 'working') {
           const newFeed = parse(response.data.contents);
           const feedId = uniqueId();
           if (isFeedExists(watchedState.feeds, newFeed)) {
@@ -217,7 +220,7 @@ const renderFeeds = (feeds) => {
   cardBodyDiv.append(cardTitleH2);
 };
 
-const renderPosts = (posts, feeds, viewedPosts, viewPost) => {
+const renderPosts = (posts, feeds, viewedPosts, viewPost, i18nInstance) => {
   const postDiv = document.querySelector('.posts');
   postDiv.innerHTML = '';
   if (feeds.length === 0) {
@@ -264,7 +267,7 @@ const renderPosts = (posts, feeds, viewedPosts, viewPost) => {
     button.setAttribute('data-id', post.id);
     button.setAttribute('data-bs-toggle', 'modal');
     button.setAttribute('data-bs-target', '#modal');
-    button.innerHTML = 'Просмотр';
+    button.innerHTML = i18nInstance.t('view');
     button.addEventListener('click', (e) => {
       e.preventDefault();
       const targetPost = _.find(posts, { id: post.id });
@@ -305,7 +308,7 @@ const renderInputStatus = (condition) => {
 
 const renderFlashMessage = (ui) => {
   const styles = {
-    default: 'text-success',
+    working: 'text-success',
     success: 'text-success',
     userError: 'text-danger',
     otherError: 'text-danger',
@@ -324,3 +327,8 @@ const clearInput = () => {
   input.value = '';
   input.focus();
 };
+
+const renderAddButton = (conditionName) => {
+  const button = document.querySelector('#add');
+  button.disabled = (conditionName === 'working');
+}

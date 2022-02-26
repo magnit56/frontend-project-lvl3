@@ -15,5 +15,6 @@ export default {
     networkError: 'Ошибка сети',
     success: 'RSS успешно загружен',
     already_exists: 'RSS уже существует',
+    view: 'Просмотр',
   },
 };
