@@ -78,7 +78,7 @@ export default (i18nInstance) => {
       .then(() => {
         if (watchedState.ui.condition === 'working') {
           const encodedUrl = encodeURIComponent(url);
-          const response = axios.get(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodedUrl}`);
+          const response = axios.get(`https://api.allorigins.win/get?url=${encodedUrl}`);
           return response;
         }
         return null;
