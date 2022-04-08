@@ -1,7 +1,9 @@
 /* eslint-disable no-use-before-define */
+import { uniqueId } from 'lodash-es';
+import * as yup from 'yup';
 import onChange from 'on-change';
-
-const { uniqueId } = lodashEs;
+import axios from 'axios';
+import _ from 'lodash';
 
 export default (i18nInstance) => {
   const state = {

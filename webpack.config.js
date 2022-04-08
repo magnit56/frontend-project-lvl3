@@ -4,14 +4,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
-// const onChange = import('on-change');
-// const yup = require('yup');
-// import onChange from 'on-change';
-// const { uniqueId } = require('lodash-es');
-// const i18n = require('i18next');
-// const axios = require('axios');
-// const onChange = require('on-change');
-
 module.exports = {
   mode: process.env.NODE_ENV || 'development',
   entry: './src/index.js',
@@ -60,13 +52,6 @@ module.exports = {
       $: 'jquery',
       jQuery: 'jquery',
       'window.jQuery': 'jquery',
-      i18n: 'i18next',
-      axios: 'axios',
-      yup: 'yup',
-      lodashEs: 'lodash-es',
-      // 'on-change': 'on-change',
-      // uniqueId: uniqueId,
-      // 'on-change': 'on-change',
     }),
     new HtmlWebpackPlugin({
       template: './index.html',
