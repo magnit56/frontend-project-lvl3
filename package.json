@@ -21,7 +21,7 @@
   "homepage": "https://github.com/magnit56/frontend-project-lvl3#readme",
   "jest": {
     "verbose": true,
-    "testURL": "http://localhost/",
+    "testURL": "http://localhost:8080/",
     "testEnvironment": "jsdom"
   },
   "devDependencies": {
